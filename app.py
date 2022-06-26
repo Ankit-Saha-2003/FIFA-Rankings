@@ -9,9 +9,9 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # Configuring database
 conn = sqlite3.connect('rankings.db')
-conn.execute('CREATE TABLE rating (rank INT, team TEXT, rating FLOAT)')
+conn.execute('CREATE TABLE IF NOT EXISTS rating (rank INT, team TEXT, rating FLOAT)')
 conn.close()
 
 @app.route('/')
 def index():
-    pass
+    return 'hello'
