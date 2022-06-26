@@ -8,5 +8,26 @@
         <div>
             <h1>FIFA World Ranking (Men's)</h1>
         </div>
+        <div>
+            <h2>Ranking</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Team</th>
+                        <th>Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td>{{ row.rank }}</td>
+                            <td>{{ row.team }}</td>
+                            <td>{{ row.rating }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </body>
 </html>
