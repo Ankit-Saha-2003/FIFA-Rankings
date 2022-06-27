@@ -23,6 +23,7 @@ URL = 'https://en.wikipedia.org/wiki/FIFA_Men%27s_World_Rankings'
 page = requests.get(URL)
 soup = BeautifulSoup(page.text, 'lxml')
 table1 = soup.find('table')
+teams_list = []
 for j in table1.find_all('tr')[3:23]:
     row_data = j.find_all('td')
     row = []
@@ -31,6 +32,7 @@ for j in table1.find_all('tr')[3:23]:
     cur = conn.cursor()
     cur.execute('INSERT INTO rating (team, rating) VALUES(?, ?)', (row[0], row[1]))
     conn.commit()
+    teams_list.append(row[0].lower())
 
 conn.close()
 
@@ -50,11 +52,12 @@ def index():
         # Adds a team to the database
         team = request.form.get('team')
         rating = request.form.get('rating')
-        if team and rating:
+        if team and rating and team.lower() not in teams_list:
             with sqlite3.connect('rankings.db') as conn:
                 cur = conn.cursor()
                 cur.execute('INSERT INTO rating (team, rating) VALUES(?, ?)', (team, rating))
                 conn.commit()
+                teams_list.append(team.lower())
 
         # Deletes a team from the database
         delete = request.form.get('delete')
