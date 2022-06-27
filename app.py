@@ -49,6 +49,43 @@ def index():
         return render_template('index.html', rows=rows)
 
     else:
+        # Updates rating based on the result of a match
+        # Official formula: https://digitalhub.fifa.com/m/f99da4f73212220/original/edbm045h0udbwkqew35a-pdf.pdf
+        team1 = request.form.get('team1')
+        team2 = request.form.get('team2')
+        result = request.form.get('result')
+        imp = request.form.get('imp')
+        if team1 and team2 and team1.lower() in teams_list and team2.lower() in teams_list and result is not None and imp and team1.lower() != team2.lower():
+            result = int(result)
+            imp = int(imp)
+            with sqlite3.connect('rankings.db') as conn:
+                cur = conn.cursor()
+                cur.execute('SELECT rating FROM rating WHERE team = ?', (team1, ))
+                team1_rating = (cur.fetchall())[0]
+                team1_rating = team1_rating[0]
+                cur.execute('SELECT rating FROM rating WHERE team = ?', (team2, ))
+                team2_rating = (cur.fetchall())[0]
+                team2_rating = team2_rating[0]
+
+                if result > 0:
+                    change = imp * (1 - 1 / (1 + 10**(-(team1_rating - team2_rating) / 600)))
+                    team1_rating += change
+                    team2_rating -= change
+
+                elif result < 0:
+                    change = imp * (1 - 1 / (1 + 10**(-(team2_rating - team1_rating) / 600)))
+                    team1_rating -= change
+                    team2_rating += change
+
+                else:
+                    team1_rating += imp * (0.5 - 1 / (1 + 10**(-(team1_rating - team2_rating) / 600)))
+                    team2_rating += imp * (0.5 - 1 / (1 + 10**(-(team2_rating - team1_rating) / 600)))
+
+                cur.execute('UPDATE rating SET rating = ? WHERE team = ?', (round(team1_rating, 2), team1))
+                conn.commit()
+                cur.execute('UPDATE rating SET rating = ? WHERE team = ?', (round(team2_rating, 2), team2))
+                conn.commit()
+
         # Adds a team to the database
         team = request.form.get('team')
         rating = request.form.get('rating')
@@ -59,7 +96,7 @@ def index():
                 conn.commit()
                 teams_list.append(team.lower())
 
-        # Updates the rating of an existing team in the database
+        # Changes the rating of an existing team in the database
         if team and rating and team.lower() in teams_list:
             with sqlite3.connect('rankings.db') as conn:
                 cur = conn.cursor()
