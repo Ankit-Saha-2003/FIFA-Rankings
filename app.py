@@ -1,3 +1,4 @@
+from ast import Delete
 from flask import Flask, render_template, request, redirect
 import sqlite3
 import requests
@@ -8,7 +9,7 @@ import pandas as pd
 app = Flask(__name__)
 
 # Ensure that templates are auto-reloaded whenever a file changes
-app.config["TEMPLATES_AUTO_RELOAD"] = True
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 # Configuring database
 conn = sqlite3.connect('rankings.db')
@@ -28,7 +29,7 @@ for j in table1.find_all('tr')[3:23]:
     row.append(row_data[2].text.lstrip('\xa0'))
     row.append(row_data[3].text.rstrip('\n'))
     cur = conn.cursor()
-    cur.execute("INSERT INTO rating (team, rating) VALUES(?, ?)", (row[0], row[1]))
+    cur.execute('INSERT INTO rating (team, rating) VALUES(?, ?)', (row[0], row[1]))
     conn.commit()
 
 conn.close()
@@ -36,6 +37,7 @@ conn.close()
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'GET':
+        # Displays the ranking table on the home page
         conn = sqlite3.connect('rankings.db')
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
@@ -45,12 +47,21 @@ def index():
         return render_template('index.html', rows=rows)
 
     else:
-        team = request.form.get("team")
-        rating = request.form.get("rating")
-
+        # Adds a team to the database
+        team = request.form.get('team')
+        rating = request.form.get('rating')
         if team and rating:
-            with sqlite3.connect("rankings.db") as conn:
+            with sqlite3.connect('rankings.db') as conn:
                 cur = conn.cursor()
-                cur.execute("INSERT INTO rating (team, rating) VALUES(?, ?)", (team, rating))
+                cur.execute('INSERT INTO rating (team, rating) VALUES(?, ?)', (team, rating))
                 conn.commit()
+
+        # Deletes a team from the database
+        delete = request.form.get('delete')
+        if delete:
+            with sqlite3.connect('rankings.db') as conn:
+                cur = conn.cursor()
+                cur.execute('DELETE FROM rating WHERE LOWER(team) = ?', (delete.lower(), ))
+                conn.commit()
+
         return redirect("/")
