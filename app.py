@@ -59,6 +59,13 @@ def index():
                 conn.commit()
                 teams_list.append(team.lower())
 
+        # Updates the rating of an existing team in the database
+        if team and rating and team.lower() in teams_list:
+            with sqlite3.connect('rankings.db') as conn:
+                cur = conn.cursor()
+                cur.execute('UPDATE rating SET rating = ? WHERE team = ?', (rating, team))
+                conn.commit()
+
         # Deletes a team from the database
         delete = request.form.get('delete')
         if delete:
