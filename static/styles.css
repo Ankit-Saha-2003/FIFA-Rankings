@@ -1,0 +1,60 @@
+body {
+    text-align: left;
+    margin: 0;
+    font-size: 20px;
+}
+
+.header {
+    text-align: center;
+    background-color: #f40002;
+    color: #ffffff;
+    padding: 40px;
+}
+
+h1 {
+    font-size: 60px;
+}
+
+h2 {
+    font-size: 30px;
+    color: #f40002;
+}
+
+.container {
+    text-align: left;
+    width: 85%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.section {
+    padding: 30px;
+}
+
+input[type="text"], input[type="number"] {
+    font-size: 20px;
+}
+
+input[type="submit"] {
+    text-align: center;
+    background-color: #ffe6e6;
+    font-size: 20px;
+    border-radius: 8px;
+    padding: 3px 10px 3px;
+}
+
+table {
+    width: 100%;
+}
+
+table th, table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 15px;
+}
+
+tbody tr:nth-of-type(odd) {
+    background-color: #ffe6e6
+}
+
+
