@@ -1,4 +1,3 @@
-from ast import Delete
 from flask import Flask, render_template, request, redirect
 import sqlite3
 import requests
@@ -60,10 +59,10 @@ def index():
             imp = int(imp)
             with sqlite3.connect('rankings.db') as conn:
                 cur = conn.cursor()
-                cur.execute('SELECT rating FROM rating WHERE team = ?', (team1, ))
+                cur.execute('SELECT rating FROM rating WHERE LOWER(team) = ?', (team1.lower(), ))
                 team1_rating = (cur.fetchall())[0]
                 team1_rating = team1_rating[0]
-                cur.execute('SELECT rating FROM rating WHERE team = ?', (team2, ))
+                cur.execute('SELECT rating FROM rating WHERE LOWER(team) = ?', (team2.lower(), ))
                 team2_rating = (cur.fetchall())[0]
                 team2_rating = team2_rating[0]
 
@@ -81,9 +80,9 @@ def index():
                     team1_rating += imp * (0.5 - 1 / (1 + 10**(-(team1_rating - team2_rating) / 600)))
                     team2_rating += imp * (0.5 - 1 / (1 + 10**(-(team2_rating - team1_rating) / 600)))
 
-                cur.execute('UPDATE rating SET rating = ? WHERE team = ?', (round(team1_rating, 2), team1))
+                cur.execute('UPDATE rating SET rating = ? WHERE LOWER(team) = ?', (round(team1_rating, 2), team1.lower()))
                 conn.commit()
-                cur.execute('UPDATE rating SET rating = ? WHERE team = ?', (round(team2_rating, 2), team2))
+                cur.execute('UPDATE rating SET rating = ? WHERE LOWER(team) = ?', (round(team2_rating, 2), team2.lower()))
                 conn.commit()
 
         # Adds a team to the database
@@ -92,6 +91,14 @@ def index():
         if team and rating and team.lower() not in teams_list:
             with sqlite3.connect('rankings.db') as conn:
                 cur = conn.cursor()
+                letters = list(team)
+                letters[0] = letters[0].upper()
+                for i in range(1, len(letters)):
+                    if letters[i-1] == ' ':
+                        letters[i] = letters[i].upper()
+                    else:
+                        letters[i] = letters[i].lower()
+                team = ''.join(str(letter) for letter in letters)
                 cur.execute('INSERT INTO rating (team, rating) VALUES(?, ?)', (team, rating))
                 conn.commit()
                 teams_list.append(team.lower())
@@ -100,7 +107,7 @@ def index():
         if team and rating and team.lower() in teams_list:
             with sqlite3.connect('rankings.db') as conn:
                 cur = conn.cursor()
-                cur.execute('UPDATE rating SET rating = ? WHERE team = ?', (rating, team))
+                cur.execute('UPDATE rating SET rating = ? WHERE LOWER(team) = ?', (rating, team.lower()))
                 conn.commit()
 
         # Deletes a team from the database
