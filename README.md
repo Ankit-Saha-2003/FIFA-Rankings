@@ -10,4 +10,4 @@ Enter the following command in your terminal while you are in the directory cont
 ```
 python -m flask run
 ```
-Now, click on the link and it will take you to the webpage.
+Click on the link displayed and it will take you to the webpage.
