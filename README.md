@@ -1,5 +1,5 @@
 # FIFA Rankings
-This is a simple database management tool for FIFA Rankings. The official top 20 ranked teams are automatically imported (for the sake of convenience) into the database by web scraping the Wikipedia page for FIFA World Rankings. The tool contains functionality for (through a webpage):
+This is a simple database management tool for FIFA Rankings. The official top 20 ranked teams are automatically imported (for the sake of convenience) into the database by web scraping the [Wikipedia page](https://en.wikipedia.org/wiki/FIFA_Men%27s_World_Rankings) for FIFA World Rankings. The tool contains functionality for (through a webpage):
 - adding a team
 - deleting a team
 - changing a team's rating
